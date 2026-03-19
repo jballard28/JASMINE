@@ -10,9 +10,9 @@ python3 ../train/tcga_train.py \
      -r 1.0 \
      -s 0.0 \
      -x 0.0 \
-     -p 5.0 \
-     -t 2.0 \
-     --lam_contrast_samp 2.0 \
+     -p 1.0 \
+     -t 1.0 \
+     --lam_contrast_samp 0.5 \
      --perturb_prop 0.25 \
      -o 0.5 \
      -l 0.002 \
