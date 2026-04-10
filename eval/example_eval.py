@@ -39,7 +39,7 @@ def main():
     parser.add_argument('-k', '--lam_kl', type=float, default=0.97, required=False)
     parser.add_argument('-c', '--lam_cos', type=float, default=3.0, required=False)
     parser.add_argument('-d', '--lam_data', type=float, default=1.0, required=False)
-    parser.add_argument('-a', '--lam_align', type=float, default=0.02, required=False)
+    parser.add_argument('-a', '--lam_align', type=float, default=0.0, required=False)
     parser.add_argument('-j', '--lam_joint_cross', type=float, default=1.0, required=False)
     parser.add_argument('-r', '--lam_real_cross', type=float, default=1.0, required=False)
     parser.add_argument('-s', '--lam_sup', type=float, default=0.0, required=False)
