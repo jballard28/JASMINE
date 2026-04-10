@@ -66,16 +66,23 @@ def main():
     met = ad.read_h5ad(os.path.join(datadir,'met-pp.h5ad'))
     prot = ad.read_h5ad(os.path.join(datadir,'prot-pp.h5ad'))
 
-    # Selecting the correct feature space to start with
+    # Standardize based on training samples
     all_data_sub = [gex, gen, met, prot]
     chosen_dims = [dgex, dgen, dmet, dprot]
     chosen_feats = []
+    splitname = 'split'+str(fold)
     for i, d in enumerate(all_data_sub):
         if chosen_dims[i] == d.shape[1]:
             print('using original features for modality ' + str(i))
+
+            # Standardizing based on train means and stds
+            d_train = d[d.obs[splitname] == 'train']
+            train_mean = np.mean(d_train.X, axis=0)
+            train_std = np.std(d_train.X, axis=0)
+            d.X = (d.X-train_mean)/train_std
             chosen_feats.append(d.X)
         else:
-            chosen_feats.append(d.obsm['X_pca'][:,:chosen_dims[i]])
+            raise Exception('Specified feature dims not supported')
 
     gex = ad.AnnData(X=chosen_feats[0],\
                          obs=gex.obs,\
@@ -127,6 +134,11 @@ def main():
     gen_train = gen[gen.obs[splitname] == 'train']
     met_train = met[met.obs[splitname] == 'train']
     prot_train = prot[prot.obs[splitname] == 'train']
+
+    gex_val = gex[gex.obs[splitname] == 'val']
+    gen_val = gen[gen.obs[splitname] == 'val']
+    met_val = met[met.obs[splitname] == 'val']
+    prot_val = prot[prot.obs[splitname] == 'val']
 
     gex_test = gex[gex.obs[splitname] == 'test']
     gen_test = gen[gen.obs[splitname] == 'test']
@@ -218,16 +230,20 @@ def main():
 
     # Get embeddings
     joint_X_train, uid_train = model.encode_sample({"gex": gex_train, "gen": gen_train, 'met': met_train, 'prot': prot_train}, lam_poe)
+    joint_X_val, uid_val = model.encode_sample({"gex": gex_val, "gen": gen_val, 'met': met_val, 'prot': prot_val}, lam_poe)
     joint_X_test, uid_test = model.encode_sample({"gex": gex_test, "gen": gen_test, 'met': met_test, 'prot': prot_test}, lam_poe)
 
     self_X_train, _ = model.cross_encode_sample({"gex": gex_train, "gen": gen_train, 'met': met_train, 'prot': prot_train}, False)
+    self_X_val, _ = model.cross_encode_sample({"gex": gex_val, "gen": gen_val, 'met': met_val, 'prot': prot_val}, False)
     self_X_test, _ = model.cross_encode_sample({"gex": gex_test, "gen": gen_test, 'met': met_test, 'prot': prot_test}, False)
 
     # Concatenate joint and self-embeddings
     jointself_X_train = np.concatenate((joint_X_train,self_X_train),axis=1)
+    jointself_X_val = np.concatenate((joint_X_val,self_X_val),axis=1)
     jointself_X_test = np.concatenate((joint_X_test,self_X_test),axis=1)
 
     train_embed = jointself_X_train
+    val_embed = jointself_X_val
     test_embed = jointself_X_test
 
     # Save embeddings to output file
@@ -254,8 +270,10 @@ def main():
                                   '.pkl'
 
     outdict = {'train_embed': train_embed,
+               'val_embed': val_embed,
                'test_embed': test_embed,
                'uid_train': uid_train,
+               'uid_val': uid_val,
                'uid_test': uid_test}
 
     with open(os.path.join(outdir, outfname), 'wb') as f:

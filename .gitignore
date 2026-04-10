@@ -1,2 +1,6 @@
 model/jasmine/__pycache__/*
 model/jasmine/models/__pycache__/*
+saved_embeddings/*
+saved_models/*
+eval_results/*
+data/*

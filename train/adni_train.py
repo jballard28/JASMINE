@@ -63,16 +63,23 @@ def main():
     met = ad.read_h5ad(os.path.join(datadir,'met-pp.h5ad'))
     prot = ad.read_h5ad(os.path.join(datadir,'prot-pp.h5ad'))
 
-    # Selecting the correct feature space to start with
+    # Standardize based on training samples
     all_data_sub = [gex, gen, met, prot]
     chosen_dims = [dgex, dgen, dmet, dprot]
     chosen_feats = []
+    splitname = 'split'+str(fold)
     for i, d in enumerate(all_data_sub):
         if chosen_dims[i] == d.shape[1]:
             print('using original features for modality ' + str(i))
+
+            # Standardizing based on train means and stds
+            d_train = d[d.obs[splitname] == 'train']
+            train_mean = np.mean(d_train.X, axis=0)
+            train_std = np.std(d_train.X, axis=0)
+            d.X = (d.X-train_mean)/train_std
             chosen_feats.append(d.X)
         else:
-            chosen_feats.append(d.obsm['X_pca'][:,:chosen_dims[i]])
+            raise Exception('Specified feature dims not supported')
 
     gex = ad.AnnData(X=chosen_feats[0],\
                          obs=gex.obs,\
