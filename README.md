@@ -38,7 +38,7 @@ python3 ../train/example_train.py \
 * `-l`: Learning rate
 * `--nmod`: Number of modalities (for simulated data)
 * `--nsamp`: Number of samples (for simulated data)
-* `--missing_setting`: # Missingness setting for simulated data (MAR, MCAR, MNAR)
+* `--missing_setting`: Missingness setting for simulated data (MAR, MCAR, MNAR). All provided settings can be found in `example_data/missing_masks`.
 * `--fold`: Which train/val/test fold to train on
 * `--datadir`: Location of data
 * `--maskdir`: Location of missingness masks for simulated data
