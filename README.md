@@ -45,7 +45,7 @@ python3 ../train/example_train.py \
 * `--modeldir`: Where to save trained models
 
 ## Embedding generation
-Embeddings can be generated and saved from a trained model using scripts similar to those in `embed`. A running example on the sample of simulated data provided in `example_data` can be found in `running_scripts/run_example_embed_jasmine.sh`. This script saves the training, validation, and test set embeddings along with their labels to a `.pkl` file.:
+Embeddings can be generated from a trained model and saved using scripts similar to those in `embed`. These scripts save the training, validation, and test set embeddings along with their labels to a `.pkl` file. A running example on the sample of simulated data provided in `example_data` can be found in `running_scripts/run_example_embed_jasmine.sh`:
 
 ```
 python3 ../embed/example_embed.py \
